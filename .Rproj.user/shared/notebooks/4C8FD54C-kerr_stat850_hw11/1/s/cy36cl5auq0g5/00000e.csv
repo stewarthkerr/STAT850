@@ -1,0 +1,1 @@
+"0","curve(dchisq(x,df=1), add = T, n = 100)"

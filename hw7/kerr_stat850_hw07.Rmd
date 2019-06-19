@@ -1,0 +1,137 @@
+---
+title: "STAT850 HW7"
+author: "Stewart Kerr"
+date: "March 11, 2019"
+output: pdf_document
+header-includes: \usepackage{../kerrmacros}
+---
+
+```{r include = FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(dplyr)
+library(knitr)
+library(car)
+library(ggplot2)
+library(MASS)
+library(lme4)
+library(lmerTest)
+library(tidyr)
+library(cowplot)
+library(multcomp)
+
+set.seed(1104)             # make random results reproducible
+
+this_file <- "kerr_stat850_hw07.Rmd"  # used to automatically generate code appendix
+```
+
+# Problem 1
+**a,b.** See attached page.
+
+**c.** 
+```{r}
+#Problem 1c
+#Load the data in 
+breadvolume <- read.csv("~/2019spring/STAT850/hw7/breadvolume.csv")
+breadvolume$fat = factor(breadvolume$fat)
+breadvolume$surfactant = factor(breadvolume$surfactant)
+breadvolume$day = factor(breadvolume$day)
+
+#Build model and do ANOVA
+bv_lm <- lm(volume ~ fat*surfactant + day, data = breadvolume)
+anova(bv_lm)
+```
+From the ANOVA table, I confirm that my answer to part b is correct. Also, with a F-statistic of 12.42 and a p-value of 0.007, there is strong evidence to suggest that there are differences based on days. I will now examine the effect of days using the `drop1` function.
+```{r}
+#Problem 1c
+#Compare to drop1
+drop1(bv_lm, test = "F")
+```
+Note that we got a slightly different F-statistic for day with a slightly larger p-value. The reason for this is that `ANOVA()` gives us type-I sum of squares while `drop1()` gives us type-III sum of squares. In the case of an unbalanced experiment, using type-I sum of squares for the F-test is not really useful because our results are dependent on which order we defined our factors in the model. Thus, the results from the `drop1()` function are correct for this unbalanced case.  
+
+```{r}
+#Problem 1c
+#Look at interaction coefficients
+summary(bv_lm)
+```
+In both the `anova()` and `drop1()` output, the sum of squares for the fat:surfactant interaction is equal. This is because the interaction term is always added to the model *after* the main effects of fat and surfactant. Also, when looking at `summary(bv_lm)` output, we notice that a few of the interaction coefficients cannot be estimated. Again, this is because there is data that is missing. To quantity the strength of evidence of an interaction between fat and surfactant, I will return to the `drop1()` output above. In the row fat:surfactant, we are performing an F-test comparing the reduced model without any interaction terms (in other words, all interaction coefficients are zero) vs. the full model which has at least one significant (non-zero) interaction term. From the R output, we find an F-statistic of 14.18 corresponding to a p-value of 0.009. This provides strong evidence that there is an interaction between fat and surfactant.
+
+**d.**
+```{r}
+#Problem 1d
+#change the baseline
+breadvolume$fat = factor(breadvolume$fat, levels = c("3","2","1"))
+bv_contrasts = contrasts(breadvolume$fat)
+
+#Now repeat c
+bv_lm2 <- lm(volume ~ fat*surfactant + day, data = breadvolume, contrasts = bv_contrasts)
+drop1(bv_lm2, test = "F")
+summary(bv_lm2)
+```
+In this problem I have made fat 3 the baseline and repeated my analysis from c. The differences are that the coefficients for fat have changed (as expected) and the coefficients for the interaction term have switched. It's probably best to set the baseline fat level to 3 because we observe all surfactants for fat 3 while for the other fat levels we have missing surfactant data.
+
+**e.**
+For this problem, I will first consider boxplots of fat:surfactant combinations across the different days.
+```{r}
+#Problem 1e
+breadvolume$fs = breadvolume$fat:breadvolume$surfactant
+qplot(fs, volume, geom = "boxplot", data = breadvolume, xlab = "Fat:Surfactant")
+```
+From the boxplots, it appears that fat 3 and surfactant 3 is best. I will use Tukey's HSD to determine if the difference is statistically significant.
+
+```{r}
+#Problem 1e
+bv_aov <- aov(volume ~ fat:surfactant + day, data = breadvolume)
+TukeyHSD(bv_aov, "fat:surfactant", ordered = TRUE)
+```
+If we focus on just the 3:3-x:x differences above, *most* of them are significant - thus I would still highly recommend the 3:3 treatment above all others. The 3:3-3:2 difference may not be significant, so fat level 3 and surfactant level 2 might be a good suggestion as well. It's worth noting that we didn't observe fat 1 with surfactant 3 or fat 2 with surfactant 2 - it's possible that those interactions would yield higher average volume than the 3:3 treatment.
+
+#Problem 2
+**a.** See attached sheet.
+
+**b.**
+For this analysis, we are primarily interested in two things: differences between laboratories (i.e. the main effect of laboratory) and the interaction between laboratory and concentration of bacteria (which comes from sampling milk at different stages of spoilage). From the model I've written down for a, we have that all factors in this analysis are random effects. Below, I have fit the model using `lmer()` and can get the variances of each random effect from `summary(milk_lmer)`. I will use these variances to calculate F-statistics and perform tests. First, however, I will visualize the data.
+```{r}
+#Problem 2b
+#Load the data in 
+milk <- read.csv("~/2019spring/STAT850/hw7/milkcontamination.csv")
+milk$lab = factor(milk$lab)
+milk$sample = factor(milk$sample)
+
+#Visualize data
+qplot(lab,bacterialcount, geom = "boxplot", data = milk)
+with(milk, interaction.plot(lab,sample,bacterialcount))
+```
+From the boxplots, it's not readily apparent that one lab significantly differs in their bacterial count estimations from the other labs. Laboratory 5 *might* estimate a higher bacterial count on average, but it's not clearly different. From the interaction plot, we observe that all labs perform similarly on samples 3 and 4, but they perform differently on samples 1 and 2. The lines for samples 1 and 2 are not parallel, so I would say that there is evidence for an interaction between laboratory and concentration of bacteria.
+
+```{r, warning=FALSE}
+#Problem 2b
+#Fit the lmer model
+milk_lmer <- lmer(bacterialcount ~ 1 + (1|lab) + (1|sample) + (1|lab:sample), data = milk)
+summary(milk_lmer)
+```
+Now I will formally test for the effects of interest. First, to test the main effect of laboratory. For the random effect model, we want to test the following hypothesis for lab:
+\[H_0: \sigma^2_{L} = 0\]
+\[H_0: \sigma^2_{L} \neq 0\]
+We can test this hypothesis using a F-test where the f-statistic is calculated as $F = \frac{MSL}{MSLC}$ where MSL is the mean squared error for the laboratory random effect and is calculated as $E(MSL) = \sigma^2_\epsilon + n\sigma^2_{LC} + cn\sigma^2_L$ and MSLC is the mean squared error for the interaction between lab and contamination and is calculated as $E(MSLC) = \sigma^2_\epsilon + n\sigma^2_{LC}$. Using the R output above, we can calculate both of these quantities and perform our F test.
+\[E(MSL) = \sigma^2_\epsilon + n\sigma^2_{LC} + cn\sigma^2_L = 101935 + 2\times269168 + 4\times2\times130561 = 1684759\]
+\[E(MSLC) = \sigma^2_\epsilon + n\sigma^2_{LC} = 101935 + 2\times269168 = 640271\]
+Thus, our F-statistic is $F = \frac{MSL}{MSLC} = \frac{1684759}{640271} = 2.63$ with 4 degrees of freedom in the numerator and 12 degrees of freedom in the denominator. The corresponding p-value is thus `pf(1684759/640271,4,12, lower.tail = FALSE)` = `r pf(1684759/640271,4,12, lower.tail = FALSE)`. Given this p-value, there is weak evidence to reject the null hypothesis that there is no random effect from laboratory. This partially agrees with my observation from the histograms above. Next, we will conduct an F-test for the interaction term.  
+
+Specifically, we are now testing the hypothesis $H_0: \sigma^2_{LC} = 0$. Our test-statistic is defined as $F = \frac{MSLC}{MSE}$ where MSLC is the mean squares error for the interaction term (calculated above) and MSError is estimated with residual variance from the R output. Thus, \[F = \frac{640271}{101935} = 6.28 \]
+The test statistic has 12 degrees of freedom in the numerator and 20 degrees of freedom in the denominator. The p-value for this test statistic is thus ~0.0002. There is strong evidence against the null hypothesis - that is, there is strong evidence that the interaction between lab and contamination is significant.  
+
+Now, we want to estimate the effects of interest. To do this, we must fit a model with fixed effects. Note that because the interaction term is significant, the main effect of laboratory must be included in the model.
+```{r}
+#Problem 2b
+milk_fixed <- lm(bacterialcount ~ lab*sample, data = milk)
+summary(milk_fixed)
+```
+The coefficient estimates are the effects of laboratory and interaction between laboratory and contamination. Note that we are using lab 1, sample 1, as the baseline. From these coefficients, it appears that lab 2 and 3 do not differ much from lab 1 but labs 4 and 5 differ significantly. This matches our expectations from the interaction plot above. Thus I would say that both of these labs are to blame. Specifically, I think the interaction between lab 4 and sample 2 (which has the highest coefficient among the interaction terms) might lead us to blame lab 4 the most. 
+
+# Problem 3
+See attached page.
+
+# Code
+```{r code = readLines(purl(this_file, documentation = 1)), echo = T, eval = F}
+# this R markdown chunk generates a code appendix
+```

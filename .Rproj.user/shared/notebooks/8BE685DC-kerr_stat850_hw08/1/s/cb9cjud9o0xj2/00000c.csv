@@ -1,0 +1,5 @@
+"0","#problem 4"
+"0","n = seq(1,100)"
+"0","n0 = 1000-9*n"
+"0","df <- data.frame(n0,n) %>% mutate(prop_power = p4power(n0,n))"
+"0","head(arrange(df, -prop_power))"

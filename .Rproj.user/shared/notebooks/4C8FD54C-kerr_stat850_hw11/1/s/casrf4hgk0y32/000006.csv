@@ -1,0 +1,6 @@
+"0","## Problem 3a, part ii"
+"0","set.seed(12345)"
+"0","#simulate data set"
+"0","p3_2 = simfun(ng=4, nr=10, fsd=1, indsd=0, b=c(1,2))"
+"0","#plot dataset"
+"0","p3_plot(p3_2, ""Problem 3a, Part ii"")"

@@ -1,0 +1,7 @@
+"0","#Problem 1a"
+"0","#Load the data in"
+"0","grapes <- read.csv(""~/2019spring/STAT850/hw6/grapes.csv"")"
+"0","grapes$fertilizer = factor(grapes$fertilizer)"
+"0","grapes$pruning = factor(grapes$pruning)"
+"0","#Construct plots"
+"0","with(grapes, interaction.plot(pruning,fertilizer, sweetness))"

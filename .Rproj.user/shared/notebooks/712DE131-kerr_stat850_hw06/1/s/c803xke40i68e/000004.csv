@@ -1,0 +1,2 @@
+"0","#Problem 1c"
+"0","plot(grape_fit, bench ~ resid(., scaled = TRUE), xlab = ""Standardized residuals"")"

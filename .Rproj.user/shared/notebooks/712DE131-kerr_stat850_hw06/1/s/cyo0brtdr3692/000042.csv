@@ -1,0 +1,7 @@
+"0","#Problem 2e"
+"0","#Predicted vs. residuals"
+"0","p3 = data.frame(predicted = predict(ion_fit), residuals(ion_fit), temp = ion$temp, energy_quantity = ion$energy_quantity) %>%"
+"0","  ggplot(aes(x=predicted, y = residuals.ion_fit., color = energy_quantity)) + geom_point(aes(shape=temp)) + labs(title = ""Predicted vs. residuals"", ylab = ""residuals"")"
+"0","#QQplot"
+"0","p4 = ggplot(data.frame(resid=residuals(ion_fit)), aes(sample=resid)) + geom_qq() + labs(title = ""QQplot of overall residuals"")"
+"0","plot(p3)"

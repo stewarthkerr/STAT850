@@ -1,0 +1,1 @@
+"0","plot(ls.diag(pain_sqrt_lm)$stud.res ~ fitted(pain_sqrt_lm), ylab = ""stud. residuals"", main = ""square root transform"", ylim = c(-2,2))"

@@ -1,0 +1,6 @@
+"0","#Generate a data from a line"
+"0","x = seq(2,6, by = 0.1)"
+"0","error1 = rnorm(41,0,0.5)"
+"0","error2 = rnorm(41,0,0.5)"
+"0","y1 = 5*x + error1"
+"0","plot(y1~x)"

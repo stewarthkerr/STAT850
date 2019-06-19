@@ -1,0 +1,24 @@
+day,temperature,pan,cooktime
+1,375,Covered,126
+1,375,Uncovered,114
+1,375,Rack in pan,96
+2,350,Covered,122
+2,350,Uncovered,116
+2,350,Rack in pan,92
+3,325,Covered,128
+3,325,Uncovered,116
+3,325,Rack in pan,104
+4,325,Covered,134
+4,325,Uncovered,124
+4,325,Rack in pan,110
+5,375,Covered,116
+5,375,Uncovered,108
+5,375,Rack in pan,90
+6,400,Covered,114
+6,400,Uncovered,102
+6,400,Rack in pan,86
+7,350,Covered,118
+7,350,Uncovered,106
+7,350,Rack in pan,96
+8,400,Covered,104
+8,400,Uncovered,98

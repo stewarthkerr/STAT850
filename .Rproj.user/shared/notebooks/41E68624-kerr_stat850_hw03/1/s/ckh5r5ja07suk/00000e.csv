@@ -1,0 +1,6 @@
+"0","#Problem 1a"
+"0","mouse <- read.csv(""~/2019spring/STAT850/hw3/mouse.txt"", sep="""")"
+"0","#Create a grouped boxplot"
+"0","ggplot(mouse, aes(x=diet, y=score, group=diet)) + "
+"0","  geom_boxplot() +"
+"0","  geom_jitter(shape=16, position=position_jitter(0.2))"

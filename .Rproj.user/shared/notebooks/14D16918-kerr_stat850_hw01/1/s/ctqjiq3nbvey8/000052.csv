@@ -1,0 +1,2 @@
+"0","lm_example = lm(yc~xc)"
+"0","plot(lm_example$residuals ~ lm_example$fitted.values, ylab = ""residuals"", xlab = ""fitted values"")"

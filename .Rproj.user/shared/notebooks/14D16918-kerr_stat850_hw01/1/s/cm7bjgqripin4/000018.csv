@@ -1,0 +1,5 @@
+"0","#Introduce dependent data points"
+"0","y2 = y1 + 4 + error2"
+"0","xc = c(x,x); yc = c(y1,y2)"
+"0","#Plot dependent data"
+"0","plot(yc~xc)"

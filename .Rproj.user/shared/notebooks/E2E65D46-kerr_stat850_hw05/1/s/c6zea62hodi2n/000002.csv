@@ -1,0 +1,26 @@
+"0","knitr::opts_chunk$set(echo = TRUE)"
+"0","library(dplyr)"
+"0","library(knitr)"
+"0","library(car)"
+"0","library(ggplot2)"
+"0","library(MASS)"
+"0","library(lme4)"
+"0","library(lmerTest)"
+"0","library(tidyr)"
+"2","
+Attaching package: ‘tidyr’
+
+"
+"2","The following object is masked from ‘package:Matrix’:
+
+    expand
+
+"
+"0","#Define mutate_cond function"
+"0","mutate_cond <- function(.data, condition, ..., envir = parent.frame()) {"
+"0","  condition <- eval(substitute(condition), .data, envir)"
+"0","  .data[condition, ] <- .data[condition, ] %>% mutate(...)"
+"0","  .data"
+"0","}"
+"0","set.seed(1104)             # make random results reproducible"
+"0","this_file <- ""kerr_stat850_hw05.Rmd""  # used to automatically generate code appendix"

@@ -1,0 +1,5 @@
+"0","dfError = 24"
+"0","LSD_pH = qt(0.975, df = dfError)*0.1227*sqrt(2/9)"
+"0","LSD_Ca = qt(0.975, df = dfError)*0.1063*sqrt(2/12)"
+"0","LSD_Comb = qt(0.975, df = dfError)*0.2126*sqrt(2/3)"
+"0","kable(rbind(LSD_pH,LSD_Ca,LSD_Comb), col.names = ""LSD"" )"

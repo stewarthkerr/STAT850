@@ -1,0 +1,7 @@
+"0","#Problem 4b"
+"0","#Plot the data"
+"0","#Create a grouped boxplot"
+"0","ggplot(apple, aes(x=treatment, y=weight_tot, group=treatment)) + "
+"0","  geom_boxplot() +"
+"0","  geom_jitter(shape=16, position=position_jitter(0.2)) +"
+"0","  ggtitle('Boxplots of total weight by treatment')"

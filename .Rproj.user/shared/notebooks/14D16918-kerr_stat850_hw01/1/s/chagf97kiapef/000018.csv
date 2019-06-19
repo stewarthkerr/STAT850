@@ -1,0 +1,3 @@
+"0","#Perform diagnostics by looking at externally studentized residuals"
+"0","outlier_lm_diag <- ls.diag(outlier_lm)"
+"0","plot(outlier_lm_diag$stud.res ~ outlier_lm$fitted.values, ylab = ""Externally Studentized Residuals"", xlab = ""fitted values"", main = ""Plot of externally studentized residuals vs. fitted values"")"

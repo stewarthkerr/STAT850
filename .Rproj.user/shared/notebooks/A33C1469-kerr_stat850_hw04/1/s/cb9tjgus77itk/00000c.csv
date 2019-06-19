@@ -1,0 +1,2 @@
+"0","#Problem 2e"
+"0","plot(rstudent(orange_aov) ~ fitted(orange_aov), xlab = ""fitted values"", ylab = ""studentized residuals"")"

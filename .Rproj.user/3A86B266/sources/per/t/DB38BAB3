@@ -1,0 +1,22 @@
+{
+    "collab_server" : "",
+    "contents" : "",
+    "created" : 1551806073765.000,
+    "dirty" : false,
+    "encoding" : "UTF-8",
+    "folds" : "",
+    "hash" : "99263615",
+    "id" : "DB38BAB3",
+    "lastKnownWriteTime" : 1555522200,
+    "last_content_update" : 1556039155996,
+    "path" : "~/2019spring/STAT850/hw7/kerr_stat850_hw07.Rmd",
+    "project_path" : "hw7/kerr_stat850_hw07.Rmd",
+    "properties" : {
+        "cursorPosition" : "119,52",
+        "scrollLine" : "0"
+    },
+    "relative_order" : 1,
+    "source_on_save" : false,
+    "source_window" : "",
+    "type" : "r_markdown"
+}

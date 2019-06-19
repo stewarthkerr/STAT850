@@ -1,0 +1,2 @@
+"0","#Problem 2e"
+"0","plot(resid(ion_fit, scaled=TRUE) ~ fitted(ion_fit), xlab = ""Fitted values"", ylab = ""Standardized residuals"")"

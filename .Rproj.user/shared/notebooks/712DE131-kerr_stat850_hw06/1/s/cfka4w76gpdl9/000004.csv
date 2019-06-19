@@ -1,0 +1,2 @@
+"0","#Problem 1c"
+"0","plot(resid(grape_fit, scaled=TRUE) ~ fitted(grape_fit), xlab = ""Fitted values"", ylab = ""Standardized residuals"")"

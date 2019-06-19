@@ -1,0 +1,1 @@
+"0","plot(ls.diag(donut_lm)$stud.res ~ fitted(donut_lm))"

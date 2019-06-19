@@ -1,0 +1,4 @@
+"0","#Problem 1c"
+"0","## observed versus fitted values by bench"
+"0","plot(grape_fit, sweetness ~ fitted(.) | bench, abline = c(0,1),"
+"0","     ylab = ""observed sweetness"", xlab = ""fitted sweetness"")"

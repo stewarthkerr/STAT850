@@ -1,0 +1,5 @@
+"0","#Problem 1a"
+"0","#Read in the data and perform the regression"
+"0","outlier <- read.csv(""~/2019spring/STAT850/hw1/outlier.txt"", sep="""")"
+"0","outlier_lm <- lm(outlier$y ~ outlier$x, qr = T)"
+"0","plot(outlier$y ~ outlier$x, main = ""Plot of y vs. x"")"

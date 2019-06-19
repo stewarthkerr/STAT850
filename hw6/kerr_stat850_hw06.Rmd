@@ -1,0 +1,194 @@
+---
+title: "STAT850 HW6"
+author: "Stewart Kerr"
+date: "March 4, 2019"
+output: pdf_document
+header-includes: \usepackage{../kerrmacros}
+---
+
+```{r include = FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(dplyr)
+library(knitr)
+library(car)
+library(ggplot2)
+library(MASS)
+library(lme4)
+library(lmerTest)
+library(tidyr)
+library(cowplot)
+
+set.seed(1104)             # make random results reproducible
+
+this_file <- "kerr_stat850_hw06.Rmd"  # used to automatically generate code appendix
+```
+
+**Note:** I also uploaded my report on Canvas if you want to see graphs with colors.
+
+# Problem 1
+**a.**
+I think the plot to best elucidate if there may be a fertilizer and pruning interaction is an interaction plot averaged across each of the different vineyards.
+```{r}
+#Problem 1a
+#Load the data in
+grapes <- read.csv("~/2019spring/STAT850/hw6/grapes.csv")
+grapes$fertilizer = factor(grapes$fertilizer)
+grapes$pruning = factor(grapes$pruning)
+
+#Construct plots
+with(grapes, interaction.plot(pruning,fertilizer, sweetness))
+```
+From the interaction plot, there does not appear to be much evidence for an interaction between fertilizer and pruning.
+\newpage
+
+**b.** This experiment is a split plot design with subsampling where the whole plots are randomized as a RCBD. As such, the model can be written out as:
+\[Y_{ijkl} = \mu + \alpha_i + \beta_j + \epsilon_{ij} + \tau_k + (\alpha\tau)_{ik} + \delta_{ijk} + \gamma_{ijkl}\]
+where $i = 1,2$ indexes the fertilizer types (nitrogen only and nitrogen with phosphorus);  
+      $j = 1,2,3$ indexes the vineyard (east, west, central);  
+      $k = 1,2,3,4$ indexes the pruning methods (50, 45, 40, or 30 buds); and  
+      $l = 1,2$ indexes the grape sampled from each trunk.  
+Also, $\epsilon_{ij} \sim N(0,\sigma^2_\epsilon)$ represents the whole plot error within each row of the vineyards, $\delta_{ijk} \sim N(0,\sigma^2_\delta)$ represents the subplot error between trunks within the vineyard, and $\gamma_{ijkl} \sim N(0,\sigma^2_\gamma)$ represents the error within a particular trunk among the two grapes selected. 
+
+There are three things we want to test: interaction of pruning and fertilizer, pruning main effect, and fertilizer main effect. That is, we're testing:
+\[1) H_0: (\alpha\tau)_{ik} = 0 \forall i,k \]
+\[2) H_0: \alpha_i = 0 \forall i\]
+\[3) H_0: \tau_k = 0 \forall k\]
+The R code to perform these tests is given below.
+```{r}
+#Problem 1b
+#Add a column for "bench"
+grapes$bench = with(grapes, vineyard:fertilizer)
+
+#make fit
+grape_fit = lmer(sweetness ~ vineyard + fertilizer + pruning + fertilizer:pruning + (1 | bench)
+                 + (1 | trunk), grapes)
+summary(grape_fit)
+anova(grape_fit)
+```
+From the summary output, we see that the number of groups matches the number we expected. Then, the tests for significance are given in the ANOVA table. First, we look at the line for fertilizer:pruning - this tests our first hypothesis that there is no interaction between fertilizer and pruning. With an F-statistic of 0.2088 and a p-value of 0.88, there is no evidence to suggest an interaction between fertilizer and pruning (as expected from 1a).  
+
+Then, we move onto the second hypothesis, that there is no effect of fertilizer on sweetness. For this test, we have an F-statistic of 14.25 and a p-value of 0.064 - which suggests possible weak evidence of a fertilizer effect. Note, however, that the degrees of freedom for this statistic is low and this analysis is underpowered compared to the analysis of the subplot (pruning). That is a limitation of this experimental design.  
+
+Lastly, we look at the effect of the different pruning levels. An F-statistic of 4.4733 was calculated corresponding to a p-value of 0.2502. Thus, there is strong evidence to suggest that pruning level has an effect on grape sweetness.
+
+**c.** For this problem, I will construct three different graphs corresponding to residuals of our fitted model.
+```{r}
+#Problem 1c
+## observed versus fitted values by bench
+plot(grape_fit, sweetness ~ fitted(.) | bench, abline = c(0,1),
+     ylab = "observed sweetness", xlab = "fitted sweetness")
+```
+The above graph depicts the residuals of each "bench" - that is each fertilizer type in each vineyard - by looking at fitted values vs. actual values. If fitted values exactly matched actual values, then data points would be on the black line. Notice that we have approximately even spread across the line for each bench - which is good.
+
+```{r}
+#Problem 1c
+plot(resid(grape_fit, scaled=TRUE) ~ fitted(grape_fit), xlab = "Fitted values", ylab = "Standardized residuals")
+```
+This plot is the customary standardized residuals vs. fitted values plot. The residuals look evenly spread across the fitted values and approximately normally distributed between -1.5 and 1.5. There are no clear patterns in the residuals. This plot looks appropriate for our assumptions.
+
+```{r}
+#Problem 1c
+plot(grape_fit, bench ~ resid(., scaled = TRUE), xlab = "Standardized residuals")
+```
+The last plot depicts boxplots of the residuals for each bench. Again, the residuals of each bench are approximately centered on zero. The W:NP group seems a little skewed, but the others look to be evenly spread. Overall, I'd say that these three plots support our assumptions about the random effects of this model.
+
+**d.** For this problem, we are fixing i = 2 (nitrogen and phosphorus fertilizer treatment), j = 1 (east vineyard), and k = 3 (40 bud pruning method). Then, we are interested in analyzing the variance of the resulting mean of sweetness of grapes fitting these conditions. That is, we are interested in $Var(\bar{Y_{213.}})$ where the dot after 3 signifies that we are averaging over many different grapes. Now, I will substite our model for Y into the variance operator:
+\[Var(\bar{Y_{213.}}) = Var(\mu+\alpha_2+\beta_1+\epsilon_{21} + \tau_3+(\alpha\tau)_{13}+\delta_{213}+\bar{\gamma_{213.}}\]
+Now, all of the fixed effects have zero variance, leaving us with only the random effects:
+\[Var(\bar{Y_{213.}}) = Var(\epsilon_{21} + \delta_{213} + \bar{\gamma_{213.}})\]
+$\epsilon_{21}$ represents the whole plot error. For this analysis, we have 2 rows of vines, therefore two whole plots. Then, from `summary(grape_fit)` above, $Var(\epsilon_{21}) = \sigma^2_\epsilon / 2 = 33.85 / 2 = 16.925$.  
+
+Then, $\delta_{213}$ represents the sub plot error between trunks. In this experiment, we have 8 trunks, thus $Var(\delta_{213}) = \sigma^2_\delta / 8 = 34.60 / 8 = 4.325$.  
+
+Lastly, we have the residual error for subsampling grapes, represented by $\gamma_{213.}$. There are 24 total grapes, thus the residual error from subsampling grapes is $Var(\gamma_{213.}) = \sigma^2_\gamma / 24 = 62.90 / 24 = 2.62$.  
+
+Thus, the overall estimated variance for average sweetness for this experiment is:
+\[Var(\bar{Y_{213.}}) = Var(\epsilon_{21} + \delta_{213} + \bar{\gamma_{213.}}) = 16.925 + 4.325 + 2.62 = 23.87\]
+\newpage
+
+# Problem 2
+**a.** I'm going to define this model as follows:
+\[Y_{ijkl} = \mu + \alpha_i + \beta_j + \tau_k + \gamma_l + (\alpha\beta)_{ij} + (\beta\tau)_{jk} + (\alpha\beta\tau)_{ijk} + \epsilon_{ijl} + \epsilon_{kl} + \epsilon_{ijkl}\]
+Where $\epsilon$ represents random effects and $\mu, \alpha, \beta, \tau, \gamma$ represent fixed effects. 
+
+In this model, 
+i = 1,2 represents the energy level (e or E)  
+j = 1,2 represents the ion quantity (q or Q)  
+k = 1,2,3 represents the annealing temperature (750, 800, or 850)  
+l = 1,2 represents the month (July or August)  
+
+Then, $\mu$ denotes the overall mean, $\alpha$ represents the energy level effect, $\beta$ represents the ion quantity effect, $\tau$ represents the annealing temperature effect, $\gamma$ represents the blocking effect of month. Then, for interactions, we have $(\alpha\beta)$ represents the energy level and ion quantity interaction, $(\alpha\tau)$ represents the energy level and annealing temperature interaction, $(\beta\tau)$ represents the ion quantity and annealing temperature interaction, and $(\alpha\beta\tau)$ represents the three-way interaction between energy level, ion quantity, and annealing temperature.
+
+Note that we assume that the random effects are normally distributed and are independent of each other: 
+\[\epsilon_{ijl} \sim N(0,\sigma^2_{ijl}), \epsilon_{kl} \sim N(0,\sigma^2_{kl}), \epsilon_{ijkl} \sim N(0,\sigma^2_{ijkl})\]
+In this way, we can think of $\epsilon_{ijl}$ as representing the vertical strip effect (that is variation within each month for a particular combination of energy level and ion quantity), $\epsilon_{kl}$ represents the horizontal strip effect (that is variation within each month for a particular annealing temperature), and $\epsilon_{ijkl}$ represents the residual random error.
+
+**b.**
+```{r}
+#Problem 2b
+#Read data in and create new columns
+ion <- read.csv("~/2019spring/STAT850/hw6/ion.csv") %>%
+  mutate(energy = substr(energy_quantity,1,1), quantity = substr(energy_quantity,2,2))
+ion$temp = factor(ion$temp)
+
+#Average across months
+ion_month_avg = summarise(group_by(ion, energy, quantity, temp), quality_average = mean(quality))
+
+#Make plots
+ggplot(data=ion_month_avg, aes(x=temp, y=quality_average, group=energy)) +
+geom_point(aes(color=energy)) + 
+geom_line(aes(color=energy)) + 
+facet_wrap(~quantity) + 
+labs(title = "Energy level, temperature, and ion quantity interaction plot", subtitle = "Ion quantity", x= "Temperature", y="Quality measure", color="Energy level")  
+```
+From the 3-way interaction plot, there does appear to be some interaction between temperature, ion quantity, and energy level. Within a specific ion quantity level, there does not appear to be an interaction between just temperature and energy level. However, going to a higher ion quantity appears to significantly increase our quality at higher energy level - evidence of at least a two-way interaction and possibly a three-way interaction.
+
+**c.**
+```{r, warning = FALSE}
+#Problem 2c
+#Create the horizontal strips and vertical strips
+Hstrip = with(ion, temp:month)
+Vstrip = with(ion, energy_quantity:month)
+
+#Make the fit
+ion_fit = lmer(quality ~ energy*quantity*temp + month + (1|Hstrip) + (1|Vstrip), data = ion)
+anova(ion_fit)
+```
+For this model, we are interested in the main effects of each of the fixed effects. We are also interested in knowing the significance of the effect of month. We can test the main effects and interactions directly from the ANOVA table. If you look at the table above, there is strong evidence for a main effect of energy level and ion quantity, and very strong evidence for an interaction between energy level and ion quantity. There is no evidence to suggest that the main effect of temperature or any of the other factors interaction with temperature is significant. In conclusion, I would suggest that annealing temperature does not really correlate with semiconductor quality.
+
+Next, we are interested in the month effect. From the ANOVA table, the F-test statistic is 0.8261 with a p-value of 0.4134. This tells us that the month effect between July and August may not be significant. It's good to know that the manufacturing process does not seem to change quality much between months.
+
+
+**d.** In part c, I said that there is strong evidence for main effects of energy level and ion quantity. Now, if we revisit the three-way interaction plot from part b, our results from part b are supported by the visualization. Specifically, we see that the curve as temperature increases from 750, 800, to 850 does not change at different energy levels and ion quantities. This supports the claim that temperature does not have any interaction with the other factors. Furthermore, quality between temperatures 750 and 800 remains flat - this suggests that the transition between this two temperatures does not significantly affect quality. However, the transition between temperature 800 and 850 does increase quality consisently. I would suggest another experiment in which there are only two levels for temperature - 850 and either 750 or 800.
+
+**e.** For residuals, we need to examine the residuals of each random effect separately. Specifically, we want to check our assumptions that the random effects are independent and normally distributed. First, I will examine the normality of the horizontal and vertical strip residuals:
+
+```{r}
+#Problem 2e
+p1 = ggplot(data.frame(resid=ranef(ion_fit)$Hstrip[,1]), aes(sample=resid)) + geom_qq() + labs(subtitle = "Horizontal random effect QQ plot")
+p2 = ggplot(data.frame(resid=ranef(ion_fit)$Vstrip[,1]), aes(sample=resid)) + geom_qq() + labs(subtitle = "Vertical random effect QQ plot")
+cowplot::plot_grid(p1,p2)
+```
+
+Both of these plots look fairly linear, thus I will conclude that our assumption of normality for the random effects is valid.
+
+Next, I will look at the residuals vs. fitted plot (to examine independence) and a qqplot of the overall residuals to examine normality of the residual random error term. 
+
+```{r}
+#Problem 2e
+#Predicted vs. residuals
+p3 = data.frame(predicted = predict(ion_fit), residuals(ion_fit), temp = ion$temp, energy_quantity = ion$energy_quantity) %>%
+  ggplot(aes(x=predicted, y = residuals.ion_fit., color = energy_quantity)) + geom_point(aes(shape=temp)) + labs(title = "Predicted vs. residuals", ylab = "residuals")
+
+#QQplot
+p4 = ggplot(data.frame(resid=residuals(ion_fit)), aes(sample=resid)) + geom_qq() + labs(title = "QQplot of overall residuals")
+
+plot(p3)
+plot(p4)
+```
+From the first plot, we see that all of the residuals are between -1 and 1 - indicating no outliers. Furthermore, there does not appear to be a clear pattern in the residuals and the residuals for all groups appear to be approximately evenly spread around 0. This lends evidence to our assumption that the residuals are normally distributed. The second plot shows a QQ plot of the overall residuals. The plot is linear, indicating that our assumption of the normality for the overall residuals is likely valid. Thus, upon analysis of the residuals, there do not appear to be any violations of our independence or normality assumptions.
+
+# Code
+```{r code = readLines(purl(this_file, documentation = 1)), echo = T, eval = F}
+# this R markdown chunk generates a code appendix
+```

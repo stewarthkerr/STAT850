@@ -1,0 +1,5 @@
+"0","#Problem 1a"
+"0","#Load in data and contrasts"
+"0","prob1 <- read.csv('hw04.csv')"
+"0","#Plot the data"
+"0","plot(prob1$y ~ prob1$trt)"

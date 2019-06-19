@@ -1,0 +1,7 @@
+"0","#Problem 2b"
+"0","#Load the data in "
+"0","milk <- read.csv(""~/2019spring/STAT850/hw7/milkcontamination.csv"")"
+"0","milk$lab = factor(milk$lab)"
+"0","milk$sample = factor(milk$sample)"
+"0","#Visualize data"
+"0","qplot(lab,bacterialcount, geom = ""boxplot"", data = milk)"

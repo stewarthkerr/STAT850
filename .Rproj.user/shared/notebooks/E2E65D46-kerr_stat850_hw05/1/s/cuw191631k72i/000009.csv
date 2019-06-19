@@ -1,0 +1,4 @@
+"0","ggplot(apple, aes(x=block, y=weight, group=block)) + "
+"0","  geom_boxplot() +"
+"0","  geom_jitter(shape=16, position=position_jitter(0.2)) + "
+"0","  ggtitle('Boxplots of total weight by block')"

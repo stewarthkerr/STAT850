@@ -1,0 +1,80 @@
+"0","knitr::opts_chunk$set(echo = TRUE)"
+"0","library(dplyr)"
+"2","
+Attaching package: ‘dplyr’
+
+"
+"2","The following objects are masked from ‘package:stats’:
+
+    filter, lag
+
+"
+"2","The following objects are masked from ‘package:base’:
+
+    intersect, setdiff, setequal, union
+
+"
+"0","library(knitr)"
+"0","library(car)"
+"2","Loading required package: carData
+"
+"2","
+Attaching package: ‘car’
+
+"
+"2","The following object is masked from ‘package:dplyr’:
+
+    recode
+
+"
+"0","library(ggplot2)"
+"0","library(MASS)"
+"2","
+Attaching package: ‘MASS’
+
+"
+"2","The following object is masked from ‘package:dplyr’:
+
+    select
+
+"
+"0","library(lme4)"
+"0","library(lmerTest)"
+"0","library(tidyr)"
+"2","
+Attaching package: ‘tidyr’
+
+"
+"2","The following object is masked from ‘package:Matrix’:
+
+    expand
+
+"
+"0","library(cowplot)"
+"2","
+Attaching package: ‘cowplot’
+
+"
+"2","The following object is masked from ‘package:ggplot2’:
+
+    ggsave
+
+"
+"0","library(multcomp)"
+"2","Loading required package: mvtnorm
+"
+"2","Loading required package: survival
+"
+"2","Loading required package: TH.data
+"
+"2","
+Attaching package: ‘TH.data’
+
+"
+"2","The following object is masked from ‘package:MASS’:
+
+    geyser
+
+"
+"0","set.seed(1104)             # make random results reproducible"
+"0","this_file <- ""kerr_stat850_hw08.Rmd""  # used to automatically generate code appendix"

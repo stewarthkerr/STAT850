@@ -1,0 +1,3 @@
+"0","#Problem 1d"
+"0","breadvolume$fs = breadvolume$fat:breadvolume$surfactant"
+"0","qplot(fs, volume, geom = ""boxplot"", data = breadvolume, xlab = ""Fat:Surfactant"")"

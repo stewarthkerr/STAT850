@@ -1,0 +1,4 @@
+"0","#Problem 2e"
+"0","p1 = ggplot(data.frame(resid=ranef(ion_fit)$Hstrip[,1]), aes(sample=resid)) + geom_qq() + labs(subtitle = ""Horizontal random effect QQ plot"")"
+"0","p2 = ggplot(data.frame(resid=ranef(ion_fit)$Vstrip[,1]), aes(sample=resid)) + geom_qq() + labs(subtitle = ""Vertical random effect QQ plot"")"
+"0","cowplot::plot_grid(p1,p2)"

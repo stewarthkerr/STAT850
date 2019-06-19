@@ -1,0 +1,5 @@
+"0","#Problem 2c"
+"0","#Construct a residuals plot"
+"0","mouse$diet = factor(mouse$diet)"
+"0","mouse_lm = lm(score ~ diet, data = mouse)"
+"0","plot(ls.diag(mouse_lm)$stud.res ~ fitted(mouse_lm), ylab = ""studentized residuals"")"

@@ -1,0 +1,7 @@
+"0","#Problem 2b"
+"0","#Load data"
+"0","orange <- read.csv(""~/2019spring/STAT850/hw4/orange.txt"", sep="""")"
+"0","orange$calcium = factor(orange$calcium)"
+"0","orange$pH = factor(orange$pH)"
+"0","#Construct plots"
+"0","with(orange, interaction.plot(pH, calcium, diam))"
